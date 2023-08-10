@@ -1,0 +1,56 @@
+RewriteEngine On
+# Disable directory browsing
+Options All -Indexes
+# File extension management
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^([^\.]+)$ $1.php [NC,L]
+
+# redirect all requests to index.php
+# RewriteCond %{REQUEST_FILENAME} !-f
+# RewriteCond %{REQUEST_FILENAME} !-d
+# RewriteRule ^.*$ /lfs/index.php [L,QSA]
+
+# remove folder name from url
+# RewriteRule ^views/(.*)$ /$1 [L,NC,R=302]
+
+# Rewrite "www.example.com -> example.com"
+RewriteCond %{HTTPS} !=on
+RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+RewriteRule ^ http://%1%{REQUEST_URI} [R=301,L]
+
+Header always edit Set-Cookie (.*) "$1;HttpOnly;Secure;SameSite=None"
+
+# Disable server signature start
+ServerSignature Off
+# custom error page
+ErrorDocument 404 /admin/404.php
+
+# Content-Security-Policy - The Content-Security-Policy header is an improved version of the X-XSS-Protection header and provides an additional layer of security.
+Header always set Content-Security-Policy: " font-src  data: *;img-src * data:; style-src * 'unsafe-inline' ;"
+
+# X-Frame-Options - The X-Frame-Options header is used to defend your website from clickjacking attack by disabling iframes on your site.
+Header set X-Frame-Options: "SAMEORIGIN"
+
+Header Set Access-Control-Expose-Headers: Content-Security-Policy
+
+# Cache-Control Begins here
+
+
+# Cross-origin resource sharing (CORS) is a mechanism that allows restricted resources on a web page to be requested from another domain outside the domain from which the first resource was served.
+Header always set Access-Control-Allow-Origin: *
+Header always set Vary: Origin
+
+# HTTP Strict-Transport-Security - This header instructs a user agent to only use HTTPs connections and it also declared by Strict-Transport-Security.
+Header set Strict-Transport-Security: "max-age=31536000; includeSubDomains; preload"
+
+# X-XSS-Protection - X-XSS also known as Cross Site Scripting header is used to defend against Cross-Site Scripting attacks.
+Header set X-XSS-Protection: "1; mode=block"
+
+# X-Content-Type-Options - The x-content-type header also called "Browser Sniffing Protection" to tell the browser to follow the MIME types indicated in the header.
+Header always set X-Content-Type-Options: "nosniff"
+
+# Referrer-Policy - The Referrer-Policy is a security header field that identifies the address of the webpage that requested the current webpage.
+Header always set Referrer-Policy: "strict-origin"
+
+# Permission-Policy - The Permissions-Policy is a new header that allows site to control which APIs or features can be used in the browser.
+# Header always set Permissions-Policy: "geolocation=(),midi=(),sync-xhr=(),microphone=(),camera=(),magnetometer=(),gyroscope=(),fullscreen=(self),payment=()"
